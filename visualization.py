@@ -8,14 +8,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+#---------------------------------------------DIMENSIONALITY REDUCTION---------------------------------------------#
+
+
 """Here the visualization functions called sevveral times will be store, in order to preserve the tidyness of the notebook """
 
 def plot_PCA_2D(x,y):
 
     pca = PCA()
-    pipe = Pipeline([('scaler', StandardScaler()), ('pca', pca)])
     plt.figure(figsize=(8,6))
-    Xt = pipe.fit_transform(x)
+    Xt = pca.fit_transform(x)
     plot = plt.scatter(Xt[:,0], Xt[:,1], c=y)
     plt.legend(handles=plot.legend_elements()[0], labels=["Return", "Not Return"])
     plt.xlabel("PC1")
@@ -26,13 +28,9 @@ def plot_PCA_2D(x,y):
 
 def plot_PCA_3D(X, y):
 
-    scaler = StandardScaler()
-    scaler.fit(X) 
-    X_scaled = scaler.transform(X)
-
     pca = PCA(n_components=3)
-    pca.fit(X_scaled) 
-    X_pca = pca.transform(X_scaled) 
+    pca.fit(X) 
+    X_pca = pca.transform(X) 
 
     ex_variance=np.var(X_pca,axis=0)
     ex_variance_ratio = ex_variance/np.sum(ex_variance)
@@ -71,8 +69,6 @@ def plot_TSNE(sample_dataset):
     sample_class = sample_class[:,np.newaxis]
     sample_features = sample_features.drop('TARGET',axis=1)
 
-    scr = StandardScaler()
-    sample_features = scr.fit_transform(sample_features)
     print("Sample Feature Shape:",sample_features.shape,"Sample Class Shape:", sample_class.shape)
 
     model = TSNE(n_components=2,random_state=0,perplexity=35)
@@ -87,3 +83,20 @@ def plot_TSNE(sample_dataset):
     sns.FacetGrid(newdf,hue="TARGET",size=6).map(plt.scatter,"Dim1","Dim2").add_legend()
     plt.title("Perplexity=35 with normalization")
     plt.show()
+
+
+#---------------------------------------------MODEL EVALUATION---------------------------------------------#
+
+
+def plot_learning_curve(train_sizes, train_scores, validation_scores, ylabel, xlabel, title):
+
+    train_scores_mean = -train_scores.mean(axis = 1)
+    validation_scores_mean = -validation_scores.mean(axis = 1)
+
+    plt.style.use('seaborn')
+    plt.plot(train_sizes, train_scores_mean, color="blue",label = 'Training error')
+    plt.plot(train_sizes, validation_scores_mean, color="green",label = 'Validation error')
+    plt.ylabel(str(ylabel), fontsize = 14)
+    plt.xlabel(str(xlabel), fontsize = 14)
+    plt.title(str(title), fontsize = 18, y = 1.03)
+    plt.legend()
