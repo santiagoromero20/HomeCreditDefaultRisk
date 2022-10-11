@@ -1,6 +1,38 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import metrics
+from sklearn.model_selection import GridSearchCV
+import time
+
+#---------------------------------------------LEARNING CURVES AND TUNNING---------------------------------------------#
+
+"""Auxiliaries"""
+
+def calculating_error(dict, key_error):
+    error_array = -dict[str(key_error)]
+    error = np.mean(error_array)
+    return error
+
+def get_errors(grid_results):
+    results = pd.DataFrame.from_dict(grid_results)
+    results = results.sort_values(by=["mean_test_score"], ascending=False)
+    results = results.head().reset_index()
+    error_cv = -results.loc[0, "mean_test_score"]
+    error_tr = -results.loc[0, "mean_train_score"]
+    print(f"Training Log Loss {error_tr:0.2f}, CV Log Loss {error_cv:0.2f}")
+    print('Train/Validation: {}'.format(round(error_cv/error_tr, 1)))
+
+def grid_search(estimator, parameters, cv, scoring, X_train, y_train):
+    grid = GridSearchCV(estimator, param_grid=parameters, cv=cv, scoring=str(scoring), return_train_score=True)
+    inicio = time.time()
+    grid.fit(X_train, y_train)
+    fin = time.time()
+    print("The time it takes to fit the model is",round(fin-inicio),"seconds.")
+    print("Best params: "+str(grid.best_params_))
+    return grid
+
+#---------------------------------------------MODEL TEST PERFORMANCES---------------------------------------------#
 
 
 def make_predictions(classifier, X_test, threshold):
@@ -28,7 +60,7 @@ def get_performance(predictions, y_test, classifier):
     cm = metrics.confusion_matrix(y_test, predictions)
     cm_as_dataframe = pd.DataFrame(data=cm)
     
-    print("The",classifier,"performance metrics:")
+    print("Performance metrics:")
     print('-'*30)
     print('Accuracy:', accuracy)
     print('Precision:', precision)
