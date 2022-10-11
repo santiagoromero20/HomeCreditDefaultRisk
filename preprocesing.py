@@ -1,8 +1,10 @@
+from doctest import ELLIPSIS_MARKER
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -11,18 +13,35 @@ warnings.filterwarnings("ignore")
 the pre processing functions, and also to avoid repetition of them and gain a clearer Notebook."""
 
 
+#DATA ERROR
+
+"""OBS:It has to be taken a particular consideration to the feature DAYS_EMPLOYED, if we take a look into that columns there is a 
+particularity that there are a lot of clients with the value of 365243..."""
+
+def error_elimination(df):
+  count = 0
+  for index, columns in df.iterrows():
+    if df.loc[index, "DAYS_EMPLOYED"] == 365243:
+      count = count + 1
+      df.loc[index, "DAYS_EMPLOYED" ] = np.nan
+
+  """So, just in this example it represents a little bit less than the 20% of the whole dataframe, there are so much errors that the
+  outliers can not be detected, so I have to directly eliminate them before even starting the outliers detection part..."""
+
+  count = 0
+  for index, columns in df.iterrows():
+    if df.loc[index, "DAYS_EMPLOYED"] == 365243:
+      count = count + 1
+
 #OUTLIERS CORRECTION
 
 def outliers(dataframe, feat):
-  Q1  = dataframe[feat].quantile(0.10)
-  Q3  = dataframe[feat].quantile(0.90)
+  percentiles = np.percentile(dataframe[feat], [25,50,75])
+  Q1, _, Q3  = percentiles[0], percentiles[1], percentiles[2]
   IQR = Q3 - Q1
-
   lower_bound = Q1 - 1.5*IQR
   upper_bound = Q3 + 1.5*IQR
-
   ls = dataframe.index[(dataframe[feat] < lower_bound) | (dataframe[feat] > upper_bound)]
-
   return ls
 
 def fill_with_empty(dataframe, feat, indexs):
@@ -36,7 +55,7 @@ def detecting_filling(dataframe, numerical_features):
     outs = outliers(dataframe, str(numerical_features[i]))
     fill_with_empty(dataframe, str(numerical_features[i]), outs)
 
-    return dataframe
+  return dataframe
 
 #FILLING MISSING DATA
 
@@ -83,53 +102,53 @@ def encoding(dataframe, categorical_features):
 
 #SCALING
 
-def scaling(dataframe, dataframe1):
+def scaling(X_train, X_test):
+
   scaler = StandardScaler()
+  columns = X_train.columns
   
-  new_features = dataframe.columns
-  dataframe[new_features] = scaler.fit_transform(dataframe[new_features])
-
-  new_features_1 = dataframe1.columns
-  dataframe1[new_features_1] = scaler.transform(dataframe1[new_features_1])
+  X_train[columns] = scaler.fit_transform(X_train[columns])
+  X_test[columns] = scaler.transform(X_test[columns])
   
-  return dataframe, dataframe1
+  return X_train, X_test
 
 
 
-"""Data Preprocessinf Function. This should be called when all the previous analysis (TSNE, Imbalanced Correction, Anomalys Detection) have been done. 
-This return you the Training and Test Dataset preprocessed ready to be use for evaluate the Performance of some Models """
+"""Data Preprocessinf Function. This return you the Training and Test Dataset preprocessed ready to be use for evaluate the Performance of some Models"""
 
-def data_preprocessing(train, test, numerical_features, categorical_features, all_features):
-  #Correct Outliers
-  numerical_features.remove("SK_ID_CURR")
-  numerical_features.remove("TARGET")
-  train = detecting_filling(train, numerical_features)
-  test  = detecting_filling(test, numerical_features)
+def data_preprocessing(data, numerical_features, categorical_features, all_features):
 
-  #Impute values for all columns missing data
-  train = imputing_missingdata(train, all_features, numerical_features, categorical_features)
-  test  = imputing_missingdata(test, all_features, numerical_features, categorical_features)
+    #Correct Outliers
+    data = detecting_filling(data, numerical_features)
 
-  #Encode categorical features
-  train = encoding(train, categorical_features)
-  test  = encoding(test, categorical_features)
+    #Impute values for all columns missing data
+    data = imputing_missingdata(data, all_features, numerical_features, categorical_features)
 
-  #Alignating Columns
-  train, test = train.align(test, join = 'inner', axis = 1)
+    #Splitting the Dataset
+    X = data.drop(['TARGET','SK_ID_CURR'], axis=1)
+    y = data["TARGET"]
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.33, random_state=1, shuffle=True, stratify=y)
+
+    #Encode categorical features
+    X_train = encoding(X_train, categorical_features)
+    X_test  = encoding(X_test, categorical_features)
+
+    #Alignating Columns
+    X_train, X_test = X_train.align(X_test, join = 'inner', axis = 1)
   
-  #Feature Scaling
-  if len(train.columns) == len(test.columns):
-    train, test = scaling(train, test)
-  else:
-    A = set(train.columns)
-    B = set(test.columns)
-    if len(A) > len(B):
-      C = A.intersection(B)
-      D = A - C 
-      print("You should add this columns to the test Dataframe:",D)
-    elif len(B) > len(A):
-      C = A.intersection(B)
-      D = B - C
-      print("You should add this columns Train Dataframe:",D)
+    #Feature Scaling
+    if len(X_train.columns) == len(X_test.columns):
+        X_train, X_test = scaling(X_train, X_test)
+    else:
+        A = set(X_train.columns)
+        B = set(X_test.columns)
+        if len(A) > len(B):
+            C = A.intersection(B)
+            D = A - C 
+            print("You should add this columns to the test Dataframe:",D)
+        elif len(B) > len(A):
+            C = A.intersection(B)
+            D = B - C
+            print("You should add this columns Train Dataframe:",D)
 
-  return train, test
+    return X_train, X_test, y_train, y_test
