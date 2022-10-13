@@ -1,17 +1,14 @@
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from time import time
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+"""Here the visualization functions called several times will be store, in order to preserve the tidyness of the notebook """
+
 #---------------------------------------------DIMENSIONALITY REDUCTION---------------------------------------------#
-
-
-"""Here the visualization functions called sevveral times will be store, in order to preserve the tidyness of the notebook """
 
 def plot_PCA_2D(x,y):
 
