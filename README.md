@@ -17,14 +17,14 @@ The other main motivation to start this project was the amount of things I was g
   * [1.2. Handilng Imbalanced Data](#heading--1-2)
     * [1.2.1. UnderSampling](#heading--2-1-1)
     * [1.2.2. OverSampling](#heading--2-1-1)
-  * [1.3. Dimensionallity Reduction](#heading--1-2)
-    * [1.3.1. PCA](#heading--2-1-1)
-    * [1.3.2. TSNE](#heading--2-1-1)
-  *  [1.4. Preprocesing and Feature Engineering](#heading--1-2)
-     * [1.4.1. Correct Outilers/Anomslous values](#heading--2-1-1)
-     * [1.4.2. Impute values for Missing Data](#heading--2-1-1)
-     * [1.4.3. Encode Categorical Features](#heading--2-1-1)
-     * [1.4.4. Feature Scaling](#heading--2-1-1)
+  *  [1.3. Preprocesing and Feature Engineering](#heading--1-2)
+     * [1.3.1. Correct Outilers/Anomslous values](#heading--2-1-1)
+     * [1.3.2. Impute values for Missing Data](#heading--2-1-1)
+     * [1.3.3. Encode Categorical Features](#heading--2-1-1)
+     * [1.3.4. Feature Scaling](#heading--2-1-1)
+  * [1.4. Dimensionallity Reduction](#heading--1-2)
+    * [1.4.1. PCA](#heading--2-1-1)
+    * [1.4.2. TSNE](#heading--2-1-1)
   *  [1.5. Training Models](#heading--1-2)
   *  [1.6. Models Evaluation](#heading--1-2)
      * [1.6.1. RandomSearch](#heading--2-1-1)
@@ -32,7 +32,7 @@ The other main motivation to start this project was the amount of things I was g
 
 ## Technologies and Teachings
 
-On this project I dealt with a very big dataset, I had more than 120 features from more than 300k clients of the bank. This obligate to oneself, to start thinking about the feature and model selection more carefully. In order to mantain a "Computantionally Efficient" project, as this was done locally on my laptop. 
+On this project I dealt with a very big dataset, I had more than 120 features from more than 300k clients of the bank. This obligate me to start thinking about the feature and model selection more carefully. In order to mantain a "Computantionally Efficient" project, as this was done locally on my laptop. 
 
 I really focus on doing a wide and insightful EDA. Also, I learned the problems and techniques to deal with a very common issue, handling a dataset with Imbalanced data.
 Even more, I had to implement Dimensionallity Reduction techniques, in order to be able of visualize the separabillity of the classes.
