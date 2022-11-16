@@ -2,6 +2,7 @@
 
 The main objective of this project was to train a model which would be able to predict the capability of a client to return a loan. In particular, I coded the model to return either 1 or 0, being this the values for being able or not, rather than the probability of returning it. The dataset I used was one from a Kaggle competition, you can see it on the Main Notebook of the project.
 
+![Alt ](img/a_upa.jpeg "Title")
 ## Motivation
 
 Nowadays, it is estimated that around 3800 millions of people have a bank account. Imagine that just if 1% of them ask for a loan, he would be talking about 38 million of citizens. Having a model which predicts wether if a client will be able to return the loan is such a powerfull tool... 
